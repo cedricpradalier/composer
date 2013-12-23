@@ -28,6 +28,7 @@ class Piano: public QLabel
 {
 	Q_OBJECT
 public:
+    static const int m_octaves = 6;
 	Piano(QWidget *parent = 0);
 public slots:
 	void updatePixmap(NoteGraphWidget *ngw);
@@ -36,6 +37,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *event);
 private:
 	BufferPlayer *m_player;
+    int m_noteHeight;
 };
 
 

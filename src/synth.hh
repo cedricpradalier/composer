@@ -83,6 +83,7 @@ public:
 	BufferPlayer(QObject *parent);
 
 	bool play(const QByteArray& ba);
+	bool pause();
 
 public slots:
 	void handleStateChanged(QAudio::State newState);

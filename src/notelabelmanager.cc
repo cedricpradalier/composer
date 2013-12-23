@@ -450,8 +450,8 @@ int NoteLabelManager::getZoomLevel() const { return int(m_pixelsPerSecond / ppsN
 
 int NoteLabelManager::s2px(double sec) const { return sec * m_pixelsPerSecond; }
 double NoteLabelManager::px2s(int px) const { return px / m_pixelsPerSecond; }
-int NoteLabelManager::n2px(double note) const { return height() - 16.0 * note; }
-double NoteLabelManager::px2n(int px) const { return (height() - px) / 16.0; }
+int NoteLabelManager::n2px(double note) const { return height()-2*192 - 16.0 * note; }
+double NoteLabelManager::px2n(int px) const { return (height()-2*192 - px) / 16.0; }
 
 
 

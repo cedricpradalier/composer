@@ -843,8 +843,12 @@ void EditorApp::on_cmdPlay_clicked()
 		if (player->currentMedia().isNull()) {
 			on_actionMusicFile_triggered();
 		} else {
-			if (player && player->state() == QMediaPlayer::PlayingState) player->pause();
-			else player->play();
+			if (player && player->state() == QMediaPlayer::PlayingState) {
+                player->pause();
+                bufferPlayers[currentBufferPlayer]->pause();
+            } else {
+                player->play();
+            }
 		}
 	}
 }
@@ -890,8 +894,12 @@ void EditorApp::playerError(QMediaPlayer::Error)
 
 void EditorApp::playBuffer(const QByteArray& buffer)
 {
-	if (bufferPlayers[currentBufferPlayer]->play(buffer))
+    int res = bufferPlayers[currentBufferPlayer]->play(buffer);
+	if (res) {
 		currentBufferPlayer = (currentBufferPlayer+1) % 2;
+    } else {
+        // printf("play returned %d\n",res);
+    }
 }
 
 
@@ -1038,19 +1046,19 @@ void EditorApp::updatePiano(int y)
 	piano->move(piano->x(), ui.noteGraphScroller->y() - y);
 }
 
-Piano::Piano(QWidget *parent): QLabel(parent), m_player(new BufferPlayer(this))
+Piano::Piano(QWidget *parent): QLabel(parent), m_player(new BufferPlayer(this)), m_noteHeight(16)
 {
 	setMouseTracking(true);
 }
 
 void Piano::updatePixmap(NoteGraphWidget *ngw)
 {
-	const int notes = 12 * 4; // Four octaves
+	const int notes = 12 * m_octaves; // Four octaves
 	const QColor borderColor = QColor("#c0c0c0");
 	const QColor selectionColor = QColor("#a00");
 	const QColor mouseColor = QColor("#090");
-	int noteHeight = 16;
-	int mousen = round((NoteGraphWidget::Height - mapFromGlobal(QCursor::pos()).y()) / 16.0);
+	int noteHeight = m_noteHeight;
+	int mousen = round((NoteGraphWidget::Height - mapFromGlobal(QCursor::pos()).y()) / (double)noteHeight);
 
 	QImage image(50, notes * noteHeight, QImage::Format_ARGB32_Premultiplied);
 	image.fill(qRgba(0, 0, 0, 0));
@@ -1099,9 +1107,13 @@ void Piano::mousePressEvent(QMouseEvent *event)
 {
 	if (!m_player) return;
 	QByteArray ba;
-	int n = round((NoteGraphWidget::Height - event->pos().y()) / 16.0);
-	Synth::createBuffer(ba, n % 12, 0.4);
-	m_player->play(ba);
+	int n = round((NoteGraphWidget::Height-2*192 - event->pos().y()) / (double)m_noteHeight);
+    printf("n %d\n",n);
+	// Synth::createBuffer(ba, n % 12, 0.4);
+    if (n < 36) {
+        Synth::createBuffer(ba, n , 0.4);
+        m_player->play(ba);
+    }
 }
 
 void Piano::mouseMoveEvent(QMouseEvent *event)

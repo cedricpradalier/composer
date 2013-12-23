@@ -100,7 +100,7 @@ void Synth::calcNext() {
 	if (n.begin != m_noteBegin) {
 		// Need to create a new buffer
 		m_noteBegin = n.begin;
-		createBuffer(m_soundData[m_curBuffer], n.note % 12, n.length);
+		createBuffer(m_soundData[m_curBuffer], n.note /* % 12 */, n.length);
 	}
 	// Compensate for the time spent in this function
 	m_delay -= timer.elapsed() / 1000.0;
@@ -171,21 +171,28 @@ bool BufferPlayer::play(const QByteArray& ba)
 	return false;
 }
 
+bool BufferPlayer::pause()
+{
+    m_player->stop();
+    m_buffer->close();
+    return true;
+}
+
 void BufferPlayer::handleStateChanged(QAudio::State newState)
 {
-	//qDebug() << "Synth" << newState;
-	switch (newState) {
-	case QAudio::IdleState: // Finished playing (no more data)
-		m_player->stop();
-		break;
-	case QAudio::StoppedState: // Stopped for other reasons
-		if (m_player->error() != QAudio::NoError) {
-			qWarning() << "Synth audio error code " << m_player->error();
-		}
-		break;
-	default:
-		break;
-	}
+    // qDebug() << "Synth" << newState;
+    switch (newState) {
+        case QAudio::IdleState: // Finished playing (no more data)
+            m_player->stop();
+            break;
+        case QAudio::StoppedState: // Stopped for other reasons
+            if (m_player->error() != QAudio::NoError) {
+                qWarning() << "Synth audio error code " << m_player->error();
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 void BufferPlayer::debugDumpStats()

@@ -15,6 +15,7 @@
 #include "song.hh"
 #include "util.hh"
 #include "busydialog.hh"
+#include "editorapp.hh"
 
 
 namespace {
@@ -27,7 +28,7 @@ namespace {
 	static const double endMarginSeconds = 5.0;
 }
 
-/*static*/ const int NoteGraphWidget::Height = 768;
+/*static*/ const int NoteGraphWidget::Height = Piano::m_octaves * 192;
 /*static*/ const QString NoteGraphWidget::BGColor = "#222";
 
 NoteGraphWidget::NoteGraphWidget(QWidget *parent)
@@ -218,7 +219,7 @@ void NoteGraphWidget::paintEvent(QPaintEvent*)
 	// Octave lines
 	QPen pen; pen.setWidth(1); pen.setColor(QColor("#666"));
 	painter.setPen(pen);
-	for (int i = 1; i < 4; ++i)
+	for (int i = -1; i < Piano::m_octaves-1; ++i)
 		painter.drawLine(x1, n2px(i*12), x2, n2px(i*12));
 
 	// Selection box
